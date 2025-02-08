@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'widgets/button.dart';
+
 class Player {
   /*
   클래스가 많은 경우, name 파라미터를 사용
@@ -85,38 +87,16 @@ class App extends StatelessWidget {
                   height: 30,
                 ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF1B33B),
-                          borderRadius: BorderRadius.circular(45),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 50),
-                          child: Text(
-                            'Transfer',
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                          ),
-                        )),
-                    Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1F2123),
-                          borderRadius: BorderRadius.circular(45),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 50),
-                          child: Text(
-                            'Request',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ))
+                    const Button(
+                        text: 'Transfer',
+                        bgColor: Color(0xFFF1B33B),
+                        textColor: Colors.black),
+                    const Button(
+                        text: 'Request',
+                        bgColor: Color(0xFF1F2123),
+                        textColor: Colors.white),
                   ],
                 )
               ],

@@ -1,0 +1,6 @@
+package com.example.clipboard_sync_bluetooth
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}

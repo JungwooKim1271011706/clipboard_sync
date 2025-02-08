@@ -1,0 +1,103 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  final TextEditingController _inputController = TextEditingController();
+  final TextEditingController _outputController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text("Clipboard Sync")),
+        body: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(controller: _inputController, decoration: InputDecoration(labelText: "클립보드 데이터 입력")),
+              SizedBox(height: 16),
+              ElevatedButton(onPressed: () {
+                child: sendClipboardData(_inputController.text);
+                },
+                child: Text("서버로 전송"),
+              ),
+              TextField(controller: _outputController, decoration: InputDecoration(labelText: "클립보드 데이터 출력")),
+              SizedBox(height: 10),
+              ElevatedButton(onPressed: () {
+                child: fetchClipboardData();
+              },
+                child: Text("서버에서 가져오기"),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /**
+   * 서버에 있는 데이터르 추출
+   */
+  Future<void> fetchClipboardData() async {
+    final getDateUrl = Uri.parse("https://192.168.219.107/clipboard/clipboard/get/kjw");
+
+    HttpClient httpClient = HttpClient();
+    httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+    HttpClientRequest request = await httpClient.getUrl(getDateUrl);
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json");
+    try {
+      HttpClientResponse response = await request.close();
+      if (response.statusCode == 200) {
+        String resultJson = await response.transform(utf8.decoder).join();
+        final Map<String, dynamic> data = jsonDecode(resultJson);
+        String clipboardData = data['data'];
+        await Clipboard.setData(ClipboardData(text: clipboardData));
+        print("클립보드 데이터 추출 : ${clipboardData}");
+      } else {
+        print("서버 코드가 200이 아님...");
+      }
+    } catch(e) {
+      print("$e");
+    }
+  }
+
+  /**
+   * 버튼 클릭 시, 서버로 데이터를 보냄
+   */
+  Future<void> sendClipboardData(String text) async {
+    final updateDateUrl = Uri.parse("https://192.168.219.107/clipboard/clipboard/upload");
+
+    HttpClient httpClient = HttpClient();
+    httpClient.badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+
+    HttpClientRequest request = await httpClient.postUrl(updateDateUrl);
+    request.headers.set(HttpHeaders.contentTypeHeader, "application/json");
+    request.add(utf8.encode(jsonEncode({
+      "userId": "kjw",
+      "data": text,
+    })));
+
+    HttpClientResponse response = await request.close();
+    if (response.statusCode == 200) {
+      print("클립보드 데이터 전송 성공 : ");
+    } else {
+      print("클립보드 데이터 전송 실패 : ${response.statusCode}");
+    }
+  }
+
+
+
+
+
+}
+
